@@ -1,0 +1,34 @@
+---
+- hosts: localhost
+  collections:
+    - theforeman.foreman
+  gather_facts: false
+  vars_files:
+    - vars/server.yml
+  tasks:
+    - name: ensure test organization
+      include_tasks: tasks/organization.yml
+      vars:
+        organization_name: "Test Organization"
+        organization_state: "present"
+
+- hosts: tests
+  collections:
+    - theforeman.foreman
+  gather_facts: false
+  vars_files:
+    - vars/server.yml
+  roles:
+    - role: basic_setup_rhel7
+      vars:
+        organization: "Test Organization"
+        username: "{{ foreman_username }}"
+        password: "{{ foreman_password }}"
+        server_url: "{{ foreman_server_url }}"
+        validate_certs: false
+        manifest_download: false
+        manifest_path: "{{ katello_manifest_path }}"
+        sync_plan_name: "RHEL7 Sync Plan"
+        sync_plan_interval: daily
+        sync_plan_sync_date: 2021-02-02 00:00:00 UTC
+        activation_key_name: "RHEL7_Key"
